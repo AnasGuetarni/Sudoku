@@ -70,17 +70,21 @@ public class Solver {
             String line;
             int j = 0;
             int i = 0;
-            //
+            // We read the buffer if it isn't empty
             while ((line = buffer.readLine()) != null) {
+                // We split at each line
                 String[] data = line.split(" ");
+                // Loop on the data
                 for (String s : data) {
+                    // We parse each numer to a Integer
                     state[i][j] = Integer.parseInt(s);
                     j++;
                 }
+                // We travel into the sudoku column by column
                 i++;
                 j = 0;
             }
-
+            // We close the buffer
             buffer.close();
         // We catch any Exception of type IOException
         } catch(IOException e) {
@@ -111,18 +115,27 @@ public class Solver {
         // We create a new State
         State newState;
         Position X;
-        // We create a Position with the MostConstraintVar in the currentState
+        // We create a Position with the MostConstraintVar in the currentState if we want to do an heuristic version
+        // Either we create a Position with the current value
         if (optimize)
             X = currentState.getMostConstraintVar();
         else
             X = currentState.getAllVar();
 
+        // We create a list of Integer
         List<Integer> D = new ArrayList<>();
+        // We add the possible Values of the sudoku in the List
         D.addAll(X.getPossibleValues());
+
+        // Loop into each element of the List
         for (int i : D) {
+            // Set the Most constraitVarValue() of the element of the list
             currentState.setMostConstraitVarValue(i);
+            // If the currentState is valid
             if(currentState.isValid()) {
+                // We return into the newState the Backtracking algorithm (recursivity)
                 newState = Backtracking(new State(currentState), optimize);
+                // If the new state is null, we return it
                 if(newState != null) return newState;
             }
         }
