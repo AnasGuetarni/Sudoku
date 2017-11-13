@@ -107,7 +107,10 @@ public class State {
     }
 
     public Position getMostConstraintVar() {
+        // We create a position called "most"
         Position most = null;
+
+        // Loop into the 2d array of the sudoku
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 if(most == null || (tiles[i][j].getPossibleValues().size() <= most.getPossibleValues().size() && tiles[i][j].getValue() == 0)) {
@@ -115,9 +118,25 @@ public class State {
                     mcx = i;
                     mcy = j;
                 }
+                //System.out.print("Tiles in getMostContraintVar: "+tiles[i][j].getPossibleValues().size()+"\n");
             }
         }
         return most;
+    }
+
+    public Position getAllVar(){
+        Position allPositions = null;
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if(allPositions == null || (tiles[i][j].getValue() == 0)) {
+                    allPositions = tiles[i][j];
+                    mcx = i;
+                    mcy = j;
+                }
+                //System.out.print("Tiles in getMostContraintVar: "+tiles[i][j].getPossibleValues().size()+"\n");
+            }
+        }
+        return allPositions;
     }
 
     public void setMostConstraitVarValue(int v) {
