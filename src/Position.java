@@ -1,59 +1,47 @@
-public class Position {
-    private int line;
-    private int column;
+import java.util.ArrayList;
+import java.util.List;
 
-    /**
-     * Main constructor
-     *
-     * @param line		The line of the position
-     * @param column	The column of the position
-     */
-    public Position (int line, int column) {
-        this.line = line;
-        this.column = column;
+/**
+ * Created by Thomas on 09.11.16.
+ */
+public class Position{
+
+    private static final List<Integer> DEFAULT_VALUES = new ArrayList<>();
+
+    static {
+        DEFAULT_VALUES.add(1);
+        DEFAULT_VALUES.add(2);
+        DEFAULT_VALUES.add(3);
+        DEFAULT_VALUES.add(4);
+        DEFAULT_VALUES.add(5);
+        DEFAULT_VALUES.add(6);
+        DEFAULT_VALUES.add(7);
+        DEFAULT_VALUES.add(8);
+        DEFAULT_VALUES.add(9);
     }
 
-    /**
-     *
-     * @return	The line
-     */
-    public int getLine () {
-        return line;
+    private int value;
+    private List<Integer> possibleValues;
+
+    public Position() {
+        this.possibleValues = new ArrayList<>();
+        this.possibleValues.addAll(DEFAULT_VALUES);
     }
 
-    /**
-     *
-     * @param line	The new value for line
-     */
-    public void setLine (int line) {
-        this.line = line;
+    public void resetValues() {
+        this.possibleValues.clear();
+        this.possibleValues.addAll(DEFAULT_VALUES);
     }
 
-    /**
-     *
-     * @return	The column
-     */
-    public int getColumn () {
-        return column;
+    public int getValue() {
+        return value;
     }
 
-    /**
-     *
-     * @param column	The new value for column
-     */
-    public void setColumn (int column) {
-        this.column = column;
+    public void setValue(int value) {
+        this.value = value;
     }
 
-    /**
-     *
-     * @return	String representation of the Position
-     */
-    @Override
-    public String toString () {
-        return "Position{" +
-                "line=" + line +
-                ", column=" + column +
-                '}';
+    public List<Integer> getPossibleValues() {
+        return possibleValues;
     }
 }

@@ -1,108 +1,64 @@
-import javax.swing.*;
-import java.awt.*;
-import java.util.Iterator;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class Solver {
-    private static boolean firstBestCaseOutputDone = false;
-    private static boolean solved = false;
 
-    public static void main (String[] args) {
+    public static void main(String[] args) {
+
+        State initalState = new State(readFile("sudoku.txt"));
+        System.out.println(initalState);
+
+        Solver su = new Solver();
+        long t1 = System.currentTimeMillis();
+        State s = su.PSCBacktracking(initalState);
+        System.out.println(System.currentTimeMillis()-t1);
+        System.out.println(s);
+    }
+
+    public static int[][] readFile(String f) {
+        int[][] state = new int[9][9];
+        BufferedReader br = null;
         try {
-            Sudoku game;
-            if (args.length < 1) {
-                game = new Sudoku();
-            } else {
-                final String FILEPATH = args[0];
-                game = new Sudoku(FILEPATH);
+            br = new BufferedReader(new FileReader(f));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            int j = 0;
+            int i = 0;
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(" ");
+                for (String s : data) {
+                    state[i][j] = Integer.parseInt(s);
+                    i++;
+                }
+                i = 0;
+                j++;
             }
 
-
-            SudokuPanel panel = new SudokuPanel(game);
-            JFrame frame = new JFrame("Sudoku");
-            JButton solveButton = new JButton("Solve sudoku");
-            frame.setLayout(null);
-            frame.setSize(1000, 1000);
-            Insets insets = frame.getInsets();
-            frame.add(solveButton);
-            frame.add(panel);
-            Dimension panelPreferredSize = panel.getPreferredSize();
-            Dimension buttonSize = solveButton.getPreferredSize();
-            solveButton.setBounds(10 + insets.left, 10 + insets.top, (int) buttonSize.getWidth(), (int) buttonSize.getHeight());
-            panel.setBounds(10 + insets.left, 10 + insets.top + 10 + (int) buttonSize.getHeight(), (int) panelPreferredSize.getWidth(), (int) panelPreferredSize.getHeight());
-            solveButton.addActionListener(e -> {
-                if (!solved) {
-                    Sudoku solution = solve(game);
-                    panel.setSudoku(solution);
-                    frame.update(frame.getGraphics());
-                    solveButton.setText("Reset");
-                    solved = true;
-                } else {
-                    solveButton.setText("Solve sudoku");
-                    panel.setSudoku(game);
-                    frame.update(frame.getGraphics());
-                    solved = false;
-                }
-            });
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setVisible(true);
-        } catch (Exception e) {
+            br.close();
+        } catch(IOException e) {
             e.printStackTrace();
         }
-
+        return state;
     }
 
-    /**
-     * Function we call to solve, will show timing as well
-     *
-     * @param game	The game we want to solve
-     * @return		The solution sudoku
-     */
-    private static Sudoku solve (Sudoku game) {
-        final long startTime = System.nanoTime();
-        System.out.println(game);
-        Sudoku solved = backtrackingSearch(game);
-        System.out.println(solved);
-        final long endTime = System.nanoTime();
-        Double timeInSeconds = ((endTime - startTime) / Math.pow(10, 9));
-        System.out.println(timeInSeconds + " seconds to solve");
-        return solved;
-    }
+    public State PSCBacktracking(State A) {
+        if(A.isComplete()) return A;
+        State r;
+        Position X = A.getMostConstraintVar();
 
-    /**
-     * Backtracking recursive solver for sudoku
-     *
-     * @param game	The game of sudoku we want to solve
-     * @return		The solution sudoku
-     */
-    private static Sudoku backtrackingSearch (Sudoku game) {
-        if (game.isFull()) {
-            return game;
-        }
-
-        Position bestCase = game.getMostConstrainedCase();
-
-        if (!firstBestCaseOutputDone) {
-            System.out.println("The first most constrained case is: " + bestCase);
-            System.out.println();
-            firstBestCaseOutputDone = true;
-        }
-
-        if (bestCase != null) {
-            Domain domain = game.getDomainOfCase(bestCase.getLine(), bestCase.getColumn());
-            Iterator<Integer> iterator = domain.getValues().iterator();
-
-            while (iterator.hasNext()) {
-                Integer value = iterator.next();
-                Sudoku current = new Sudoku(game);
-                current.fillCase(bestCase.getLine(), bestCase.getColumn(), value);
-                Sudoku result = backtrackingSearch(current);
-                if (result != null) {
-                    return result;
-                }
+        List<Integer> D = new ArrayList<>();
+        D.addAll(X.getPossibleValues());
+        for (int i : D) {
+            A.setMostConstraitVarValue(i);
+            if(A.isValid()) {
+                r = PSCBacktracking(new State(A));
+                if(r != null) return r;
             }
         }
-
         return null;
     }
-
 }
